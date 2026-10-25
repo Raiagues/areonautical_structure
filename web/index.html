@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101923">
+  <meta name="description" content="Laboratório interativo de estruturas alares: flexão, torção e flambagem em 3D.">
+  <title>Estruturas alares · Laboratório</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css"><script type="module" src="app.mjs"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 24 16 4l13 20-13-6zM16 4v14"/></svg><span>ESTRUTURAS <b>ALARES</b></span></a>
+  <nav class="tabs" aria-label="Análise"><button data-mode="bending" class="selected" aria-pressed="true"><small>01</small> Flexão</button><button data-mode="torsion" aria-pressed="false"><small>02</small> Torção</button><button data-mode="buckling" aria-pressed="false"><small>04</small> Flambagem</button></nav>
+  <button id="about" class="quiet">Sobre o modelo ↗</button>
+</header>
+<main class="workspace">
+  <aside class="inputs" aria-label="Parâmetros da análise">
+    <div class="panel-heading"><span>CONFIGURAÇÃO</span><button id="reset" class="quiet">Restaurar</button></div>
+    <form id="parameters">
+      <fieldset><legend>Condição de voo</legend><div id="cases" class="cases" role="group" aria-label="Condições de voo"></div>
+        <div class="three-fields"><label>n <span>g</span><input name="n" type="number" step="0.01" required></label><label>α <span>°</span><input name="alpha" type="number" step="0.1" required></label><label>V <span>m/s</span><input name="speed" type="number" step="1" required></label></div>
+      </fieldset>
+      <fieldset><legend>Geometria</legend><div class="two-fields">
+        <label>Envergadura <span>m</span><input name="span" type="number" step="0.1" required></label>
+        <label>Corda <span>m</span><input name="chord" type="number" step="0.05" required></label>
+        <label>Altura da caixa <span>m</span><input name="height" type="number" step="0.01" required></label>
+        <label>Massa <span>kg</span><input name="mass" type="number" step="50" required></label>
+      </div></fieldset>
+      <fieldset><legend>Espessuras <span>mm</span></legend><div class="three-fields">
+        <label>Peles · t₁<input name="t1" type="number" step="0.1" data-scale="1000" required></label>
+        <label>Externas · t₂<input name="t2" type="number" step="0.1" data-scale="1000" required></label>
+        <label>Internas · t₃<input name="t3" type="number" step="0.1" data-scale="1000" required></label>
+      </div></fieldset>
+      <details><summary>Materiais e aerodinâmica</summary>
+        <p class="field-caption">Peles · Alumínio / Almas · Titânio</p>
+        <div class="two-fields">
+          <label>E alumínio <span>GPa</span><input name="E1" type="number" data-scale="0.000000001" step="1" required></label>
+          <label>E titânio <span>GPa</span><input name="E2" type="number" data-scale="0.000000001" step="1" required></label>
+          <label>ν alumínio<input name="nu1" type="number" step="0.01" required></label><label>ν titânio<input name="nu2" type="number" step="0.01" required></label>
+          <label>σe alumínio <span>MPa</span><input name="yield1" type="number" data-scale="0.000001" step="10" required></label>
+          <label>σe titânio <span>MPa</span><input name="yield2" type="number" data-scale="0.000001" step="10" required></label>
+          <label>Densidade <span>kg/m³</span><input name="rho" type="number" step="0.001" required></label><label>Cm<input name="cm" type="number" step="0.001" required></label>
+          <label>CD₀<input name="cd0" type="number" step="0.001" required></label><label>k induzido<input name="k" type="number" step="0.001" required></label>
+        </div>
+      </details>
+      <details id="buckling-controls"><summary>Reforçadores e nervuras</summary>
+        <div class="two-fields"><label>Fator de segurança<input name="safety" type="number" step="0.1" required></label><label>Raio de giração <span>mm</span><input name="radius" type="number" data-scale="1000" step="0.5" required></label></div>
+        <label class="check"><input type="checkbox" id="envelope" checked> Dimensionar para P1–P5 + atual</label>
+      </details>
+    </form>
+    <p id="input-error" class="error" role="alert" hidden></p>
+    <div class="file-actions"><button id="export">↓ Exportar</button><button id="import">↑ Abrir cenário</button><input type="file" id="file" accept=".json,application/json" hidden></div>
+    <a class="source-link" href="https://github.com/Raiagues/areonautical_structure/tree/main/legacy" target="_blank" rel="noopener">Trabalhos originais ↗</a>
+  </aside>
+  <section class="analysis" aria-label="Resultados interativos">
+    <div class="analysis-heading"><div><span class="eyebrow">LABORATÓRIO / UFSM</span><h1 id="analysis-title">Flexão da estrutura alar</h1></div><span id="condition-badge" class="badge">P1 · 7,5 g</span></div>
+    <div class="metrics" id="metrics" aria-live="polite"></div>
+    <section class="viewer" aria-label="Modelo tridimensional">
+      <div class="viewer-toolbar"><label class="inline-label">Campo <select id="field"><option value="sigma">Tensão normal · MPa</option><option value="tau">Cisalhamento de torção · MPa</option><option value="displacement">Deslocamento · mm</option><option value="utilization">Flambagem · utilização</option></select></label><div class="view-buttons"><button id="home" title="Reposicionar câmera">⌂ <span>Vista inicial</span></button><button id="open-box" aria-pressed="false">Abrir caixa</button></div></div>
+      <div id="scene" tabindex="0" role="img" aria-label="Caixa alar 3D. Arraste para girar e use a roda para ampliar. Os resultados também estão disponíveis nos gráficos e na exportação."></div>
+      <div id="scene-error" class="scene-error" role="status" hidden>Visualização 3D indisponível. Os cálculos, a seção e a exportação continuam disponíveis.</div>
+      <div id="probe" class="probe" hidden></div>
+      <div class="legend"><span id="legend-title">σ · MPa</span><div id="colorbar"></div><div class="legend-values"><span id="legend-min"></span><span id="legend-mid"></span><span id="legend-max"></span></div></div>
+      <div class="viewer-caption"><span>Arraste para girar · Role para ampliar</span><span id="model-badge">3 células · semienvergadura</span></div>
+    </section>
+    <div class="view-controls">
+      <label>Seção <output id="station-value">0,00 m</output><input id="station" type="range" min="0" max="240" step="1" value="0"></label>
+      <label>Deformada <output id="scale-value">10×</output><input id="deformation" type="range" min="0" max="40" step="1" value="10"></label>
+      <label class="check"><input id="show-original" type="checkbox" checked> Contorno original</label>
+    </div>
+    <p id="assessment" class="assessment" role="status"></p>
+    <div class="plots">
+      <section class="plot-card"><div class="card-heading"><h2>Seção transversal</h2><span id="section-label">x = 0,00 m</span></div><svg id="section" viewBox="0 0 440 220" role="img" aria-label="Tensões na seção transversal e eixo neutro"></svg><div class="section-key"><span><i class="cyan-dot"></i> Centroide / centro de torção</span><span>┄ Eixo neutro</span></div></section>
+      <section class="plot-card"><div class="card-heading"><h2>Ao longo da asa</h2><select id="chart" aria-label="Gráfico longitudinal"><option value="loads">Cargas · kN/m</option><option value="shear">Cortantes · kN</option><option value="moments">Momentos · kN·m</option><option value="deflection">Deflexão · mm</option><option value="torque">Torque · kN·m</option><option value="twist">Torção · °</option><option value="flow">Fluxos q · kN/m</option></select></div><svg id="chart-svg" viewBox="0 0 540 220" role="img" aria-label="Distribuição longitudinal"></svg><div id="chart-key" class="section-key"></div></section>
+    </div>
+    <details class="results-details"><summary>Comparar condições e consultar resultados</summary><div class="table-scroll"><table id="comparison"></table></div><div class="properties" id="properties"></div><div class="table-scroll"><table id="design-table"></table></div></details>
+    <footer>Modelo educacional · Elasticidade linear <a href="https://github.com/Raiagues/areonautical_structure/blob/main/docs/MODEL.md" target="_blank" rel="noopener">Hipóteses e validação ↗</a></footer>
+  </section>
+</main>
+<dialog id="about-dialog" aria-labelledby="about-title"><h2 id="about-title">Sobre o modelo</h2><p>Trabalhos 1, 2 e 4 de Estruturas Aeronáuticas. Caixa retangular de três células, engastada na raiz.</p><p>Flexão por seção ponderada, torção multicelular e estimativa elástica de reforços sob compressão. As cores mostram valores calculados; a escala da deformada é apenas visual.</p><p>Geometria medida nas linhas médias. As espessuras iniciais são um cenário editável; não reproduzem todos os casos históricos. A flambagem considera apoios simples e reforçadores idealizados pelo raio de giração. Não inclui flambagem por cisalhamento ou pós-flambagem.</p><p>Os originais e as correções numéricas estão documentados no repositório.</p><a href="https://github.com/Raiagues/areonautical_structure" target="_blank" rel="noopener">Código, relatórios e enunciados ↗</a><form method="dialog"><button autofocus>Voltar à análise</button></form></dialog>
+<dialog id="export-dialog" aria-labelledby="export-title"><h2 id="export-title">Exportar análise</h2><div class="export-actions"><button id="csv">Resultados · CSV</button><button id="json">Cenário + resultados · JSON</button><button id="png">Vista 3D · PNG</button></div><form method="dialog"><button>Fechar</button></form></dialog>
+<noscript>Ative o JavaScript para calcular e visualizar as análises.</noscript>
+</body></html>

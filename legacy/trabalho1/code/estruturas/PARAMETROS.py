@@ -1,0 +1,30 @@
+# -*- coding.: utf-8 -*-
+"""
+Created on Tue May  9 16:27:22 2023
+
+@author: Emilly Raiane
+"""
+GRAVIDADE = 0
+CD0 = 0
+K = 0
+DENSIDADE = 0
+
+FATOR_CARGA = 0
+ALPHA = 0
+VELOCIDADE = 0
+
+MODULO_ELASTICIDADE_1 = 0 
+COEF_POISSON_1 = 0
+TENSAO_ESCOAMENTO_1 = 0
+
+MODULO_ELASTICIDADE_2 = 0 
+COEF_POISSON_2 = 0
+TENSAO_ESCOAMENTO_2 = 0
+
+DIM_ENVERG = 0
+DIM_CORDA = 0
+DIM_H = 0
+ESP_1 = 0
+ESP_2 = 0
+ESP_3 = 0
+MTOW = 0

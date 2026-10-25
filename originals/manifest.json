@@ -1,0 +1,261 @@
+{
+  "archives": [
+    {
+      "path": "originals/Codigo_trabalho1.zip",
+      "sha256": "a6401e32765f04a6712c9392fd9109d766b9fc40b0f453612c43f0daf1e55a65",
+      "bytes": 295604
+    },
+    {
+      "path": "originals/Trabalho01_FlexaoEstruturaAlar.pdf",
+      "sha256": "b75752e87e64ab89e3a18cd3f63550dbbca190cb46bd760a13ce0b5ecfdfeb34",
+      "bytes": 69938
+    },
+    {
+      "path": "originals/Trabalho02_TorcaoEstruturaAlar.pdf",
+      "sha256": "e9252f1b968b0cc62660f7d2709dd2dacfab037f3001f02e0531666d505b0f11",
+      "bytes": 69593
+    },
+    {
+      "path": "originals/Trabalho04_Flambagem.pdf",
+      "sha256": "6b8639e6123b30b23d18e8d4c06bfe93da54d4f697a34784f744ab3f62cb67d4",
+      "bytes": 70438
+    },
+    {
+      "path": "originals/codigo_trabalho2.zip",
+      "sha256": "f44f72f50bd2d98400e457c4c2c5e1890d2152343ffa575a7df3cf9606d54ddd",
+      "bytes": 423556
+    },
+    {
+      "path": "originals/codigo_trabalho4.zip",
+      "sha256": "99edad0268454ccf64e3be84ecbf5890cd63c2f830ed0bad1b325a8239adc348",
+      "bytes": 544094
+    },
+    {
+      "path": "originals/relatorio_trabalho1.zip",
+      "sha256": "c2c00099a75bc17ad600fc8cfac0a3b49237b2a35261a49539379df927e904f2",
+      "bytes": 2662905
+    },
+    {
+      "path": "originals/relatorio_trabalho2.zip",
+      "sha256": "b260b81bf61c5a4c3a16ed63c030048dd76bafe1026be6ab661337f2dbe72e92",
+      "bytes": 4152938
+    },
+    {
+      "path": "originals/relatorio_trabalho4.zip",
+      "sha256": "6fef3e599a0dca495132c18352fdebd2b07ddc1a13c09968e9aba2b891493374",
+      "bytes": 4326498
+    }
+  ],
+  "code": [
+    {
+      "path": "legacy/trabalho1/code/estruturas/EIXO_NEUTRO.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/EIXO_NEUTRO.py",
+      "sha256": "4b43bfe0340e26185b74126f1b524ba6f1f577ef985e2f3dea620718e77f741c"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/DEFLEXAO.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/DEFLEXAO.py",
+      "sha256": "2844a89d918f48bbde6632e596253b2d76cc35ab5d839cd7d74045f8286ea841"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/PARAMETROS.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/PARAMETROS.py",
+      "sha256": "7bd6d1cd8fd32d18c3c0f7b9f388f86ae33a1e71e44636c7a7e2baae22ffd69b"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/AERODINAMICA.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/AERODINAMICA.py",
+      "sha256": "9b4c1848d488d43973d8ed2c0fda7f619c63d01cdf244e464fc149c7b112141a"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/RESULTADOS.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/RESULTADOS.py",
+      "sha256": "ab2b4f585d07b0f6ac03aed86162f1740a9b4408c597a2ba6dc072cf2a548f72"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/PLOTS.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/PLOTS.py",
+      "sha256": "63bf23ecbf857e65fe6ce6d4aa9af8faca923ccec9b52bd4e19784318529c956"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/main.ipynb",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/main.ipynb",
+      "sha256": "4213b62d363acbc42a6cdd7dcf136f8d2372dce892d5e33e8905dd96453cd8c9"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/PROPRIEDADES_AREA.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/PROPRIEDADES_AREA.py",
+      "sha256": "ff7fad796789f03526b1c87ed3e7ad67e4bdf7c9f873ac36f953dfca8e77c0ca"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/TENSAO.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/TENSAO.py",
+      "sha256": "169ea8bffcc559b3c5d2f29c0d0f7ef33c69723bc1554ae804cd1a43081bf1cb"
+    },
+    {
+      "path": "legacy/trabalho1/code/estruturas/VN.py",
+      "archive": "originals/Codigo_trabalho1.zip",
+      "member": "estruturas/VN.py",
+      "sha256": "ee4b114d44458a1ff96c9933d660dd22cedae59f440139aada57dfe47cd75b08"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/AERODINAMICA.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/AERODINAMICA.py",
+      "sha256": "ec123360f3ba1498b30cc947e018b64c68ae5c9b6998b8b81236129045cf8555"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/CISALHAMENTO.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/CISALHAMENTO.py",
+      "sha256": "058618b7bf76cd743390e94eeb624e364a9f26cce15ded3cbe3f3f96eb0e7b20"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/DEFLEXAO.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/DEFLEXAO.py",
+      "sha256": "2844a89d918f48bbde6632e596253b2d76cc35ab5d839cd7d74045f8286ea841"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/EIXO_NEUTRO.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/EIXO_NEUTRO.py",
+      "sha256": "4b43bfe0340e26185b74126f1b524ba6f1f577ef985e2f3dea620718e77f741c"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/main.ipynb",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/main.ipynb",
+      "sha256": "296869548eaf497726aea7d097a5b248235223cd9e28f5c98c4e3d520a419c7f"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/PARAMETROS.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/PARAMETROS.py",
+      "sha256": "a19c8e5cbacf8db4c271e374d4922335688be9d85b839ca52bd5e10381ed9c8b"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/PLOTS.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/PLOTS.py",
+      "sha256": "e7c1475d551f82611db6cc6b5c5f0b59bb80d24ba2f4df78fd53aa13bec64ced"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/PROPRIEDADES_AREA.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/PROPRIEDADES_AREA.py",
+      "sha256": "ff7fad796789f03526b1c87ed3e7ad67e4bdf7c9f873ac36f953dfca8e77c0ca"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/RESULTADOS.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/RESULTADOS.py",
+      "sha256": "66e2197fcf95241ca8fa8364de3e4981a8d6d02aaa5f6de74a31bb787f3f4139"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/TENSAO.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/TENSAO.py",
+      "sha256": "006c983576071e963fe9cb145e483e9917137338b23a5cef7d1bf65970cbb454"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/TORCAO.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/TORCAO.py",
+      "sha256": "204f3221addb965265c3a9b35e992479e48daee3e676b8f7bc5f7e2841a0d522"
+    },
+    {
+      "path": "legacy/trabalho2/code/codigo estruturas/VN.py",
+      "archive": "originals/codigo_trabalho2.zip",
+      "member": "codigo estruturas/VN.py",
+      "sha256": "ee4b114d44458a1ff96c9933d660dd22cedae59f440139aada57dfe47cd75b08"
+    },
+    {
+      "path": "legacy/trabalho4/code/AERODINAMICA.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "AERODINAMICA.py",
+      "sha256": "ec123360f3ba1498b30cc947e018b64c68ae5c9b6998b8b81236129045cf8555"
+    },
+    {
+      "path": "legacy/trabalho4/code/CISALHAMENTO.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "CISALHAMENTO.py",
+      "sha256": "058618b7bf76cd743390e94eeb624e364a9f26cce15ded3cbe3f3f96eb0e7b20"
+    },
+    {
+      "path": "legacy/trabalho4/code/DEFLEXAO.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "DEFLEXAO.py",
+      "sha256": "2844a89d918f48bbde6632e596253b2d76cc35ab5d839cd7d74045f8286ea841"
+    },
+    {
+      "path": "legacy/trabalho4/code/EIXO_NEUTRO.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "EIXO_NEUTRO.py",
+      "sha256": "4b43bfe0340e26185b74126f1b524ba6f1f577ef985e2f3dea620718e77f741c"
+    },
+    {
+      "path": "legacy/trabalho4/code/FLAMBAGEM.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "FLAMBAGEM.py",
+      "sha256": "87d992adfbdd86f13f3828a020ad41f7ce01239c84921f79a5a9e4c1725d7134"
+    },
+    {
+      "path": "legacy/trabalho4/code/main.ipynb",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "main.ipynb",
+      "sha256": "4e708c4c0e0b3f44d055e39e42305e8c02049dc9134f9e44bc899104c3a8c7b6"
+    },
+    {
+      "path": "legacy/trabalho4/code/PARAMETROS.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "PARAMETROS.py",
+      "sha256": "a19c8e5cbacf8db4c271e374d4922335688be9d85b839ca52bd5e10381ed9c8b"
+    },
+    {
+      "path": "legacy/trabalho4/code/PLOTS.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "PLOTS.py",
+      "sha256": "e7c1475d551f82611db6cc6b5c5f0b59bb80d24ba2f4df78fd53aa13bec64ced"
+    },
+    {
+      "path": "legacy/trabalho4/code/PROPRIEDADES_AREA.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "PROPRIEDADES_AREA.py",
+      "sha256": "ff7fad796789f03526b1c87ed3e7ad67e4bdf7c9f873ac36f953dfca8e77c0ca"
+    },
+    {
+      "path": "legacy/trabalho4/code/RESULTADOS.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "RESULTADOS.py",
+      "sha256": "66e2197fcf95241ca8fa8364de3e4981a8d6d02aaa5f6de74a31bb787f3f4139"
+    },
+    {
+      "path": "legacy/trabalho4/code/TENSAO.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "TENSAO.py",
+      "sha256": "006c983576071e963fe9cb145e483e9917137338b23a5cef7d1bf65970cbb454"
+    },
+    {
+      "path": "legacy/trabalho4/code/TORCAO.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "TORCAO.py",
+      "sha256": "204f3221addb965265c3a9b35e992479e48daee3e676b8f7bc5f7e2841a0d522"
+    },
+    {
+      "path": "legacy/trabalho4/code/VN.py",
+      "archive": "originals/codigo_trabalho4.zip",
+      "member": "VN.py",
+      "sha256": "ee4b114d44458a1ff96c9933d660dd22cedae59f440139aada57dfe47cd75b08"
+    }
+  ]
+}
