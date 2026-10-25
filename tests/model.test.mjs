@@ -64,3 +64,27 @@ test('each operating case is finite, and invalid inputs fail explicitly',()=>{
   for(const c of CASES){const r=analyze(c);for(const v of Object.values(r.summary))assert.ok(Number.isFinite(v));}
   for(const p of [{t1:0},{rho:NaN},{span:Infinity},{speed:'100'},{height:1,chord:.3}])assert.throws(()=>analyze(p));
 });
+
+
+test('visual profile closes and projection does not change structural coordinates',async()=>{
+  const {wingSection}=await import('../web/visual-data.mjs');
+  for(const y of [-1,1])for(const z of [-.25,.25]){const [yy,zz]=wingSection(y,z,2,.5);close(yy,y);close(zz,0);}
+  const top=wingSection(.4,.25,2,.5),bottom=wingSection(.4,-.25,2,.5);
+  assert.ok(top[1]>bottom[1]);close(top[0],.4);
+});
+test('jet matches original Matplotlib samples including saturated extrema',async()=>{
+  const {jet}=await import('../web/visual-data.mjs');
+  for(const [t,expected] of [[0,[0,0,.5]],[.25,[0,.503921568627451,1]],[.5,[.4901960784313725,1,.4775458570524984]],[.75,[1,.5816993464052289,0]],[1,[.5,0,0]]])jet(t).forEach((v,i)=>close(v,expected[i]));
+});
+test('compression arrows use actual signed stress and exact partial-panel integration',async()=>{
+  const {panelCompression,compressionLoads}=await import('../web/visual-data.mjs');
+  const r=analyze({alpha:0,cd0:0,k:0}),neg=analyze({alpha:0,cd0:0,k:0,n:-7.5});
+  const top=r.section.panels.find(p=>p.id==='top0'),bottom=r.section.panels.find(p=>p.id==='bottom0'),wall=r.section.panels.find(p=>p.id==='left');
+  const sigma=Math.abs(stressAt(r,top,0,...top.a));
+  close(panelCompression(r,top,0),sigma*top.t*top.width);
+  close(panelCompression(r,bottom,0),0);
+  close(panelCompression(neg,bottom,0),panelCompression(r,top,0));
+  close(panelCompression(r,wall,0),Math.abs(stressAt(r,wall,0,...wall.a))*wall.width*wall.t/4);
+  assert.equal(compressionLoads(r,r.x.length-1).length,0);
+  assert.equal(compressionLoads(analyze({n:0,cd0:0,k:0,cm:0}),0).length,0);
+});

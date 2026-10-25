@@ -50,3 +50,43 @@ test('invalid values block exports; JSON roundtrip and CSV downloads work',async
   await page.locator('#file').setInputFiles({name:'bad.json',mimeType:'application/json',buffer:Buffer.from('{"schema":"wrong"}')});
   await expect(page.locator('#input-error')).toBeVisible();await expect(page.locator('[name=span]')).toHaveValue('14');
 });
+
+
+test('wing, V–n selection, loads and box view stay linked',async({page},testInfo)=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/');await page.waitForFunction(()=>document.documentElement.dataset.ready==='true');
+  await expect(page.locator('#scene')).toHaveAttribute('data-geometry','wing');
+  await expect(page.locator('#box-view')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#vn-diagram [data-flight="0"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#load-summary')).toContainText('My');
+  await page.screenshot({path:testInfo.outputPath('wing-bending.png'),fullPage:true});
+  await page.getByRole('button',{name:/Selecionar P3:/}).click();
+  await expect(page.locator('#condition-badge')).toContainText('P3');
+  await expect(page.locator('#vn-diagram [data-flight="2"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#cases [data-case="2"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#load-summary .lift').first()).toContainText('-');
+  await page.getByRole('button',{name:/Selecionar P2:/}).focus();await page.keyboard.press('Enter');
+  await expect(page.locator('[name=speed]')).toHaveValue('180');
+  await page.locator('[name=n]').fill('2');await page.locator('[name=n]').blur();
+  await expect(page.locator('#vn-custom')).toBeVisible();
+  await expect(page.locator('#condition-badge')).toContainText('Livre');
+  await page.getByRole('button',{name:'Restaurar'}).click();
+  await page.getByRole('button',{name:'02 Torção'}).click();
+  await expect(page.locator('#load-summary')).toContainText('m′');
+  await expect(page.locator('#scene')).toHaveAttribute('data-load-mode','torsion');
+  await page.screenshot({path:testInfo.outputPath('wing-torsion.png'),fullPage:true});
+  await page.getByRole('button',{name:'Esforços',exact:true}).click();
+  await expect(page.locator('#load-summary')).toBeHidden();
+  await expect(page.locator('#scene')).toHaveAttribute('data-load-mode','hidden');
+  await page.getByRole('button',{name:'Esforços',exact:true}).click();
+  await page.getByRole('button',{name:'04 Flambagem'}).click();
+  await expect(page.locator('#load-summary')).toContainText('Σ Nc');
+  await page.screenshot({path:testInfo.outputPath('wing-buckling.png'),fullPage:true});
+  await page.getByRole('button',{name:'Só caixa',exact:true}).click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-geometry','box');
+  await expect(page.locator('#box-view')).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'Só caixa',exact:true}).click();
+  await expect(page.locator('#scene')).toHaveAttribute('data-geometry','wing');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  expect(errors).toEqual([]);
+});

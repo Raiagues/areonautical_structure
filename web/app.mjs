@@ -1,6 +1,9 @@
 import { DEFAULTS, CASES, LIMITS, analyze, compareCases, designBuckling, validate, stressAt } from './model.mjs';
 import { WingViewer, colorCSS, fieldRange, fieldValue, gradient } from './viewer.mjs';
 
+import { flightEnvelope } from './flight-envelope.mjs';
+import { compressionLoads } from './visual-data.mjs';
+
 const $ = id => document.getElementById(id);
 const fmt = (n, digits = 2) => Number(n).toLocaleString('pt-BR', { maximumFractionDigits: digits, minimumFractionDigits: digits });
 const form = $('parameters');
@@ -46,7 +49,7 @@ try {
   });
 } catch (e) { $('scene-error').hidden = false; $('png').disabled = true; console.warn('3D indisponível:', e.message); }
 
-function options() { return { mode, field, reinforced, station:Number($('station').value), scale:Number($('deformation').value), open:$('open-box').getAttribute('aria-pressed') === 'true', original:$('show-original').checked }; }
+function options() { return { mode, field, reinforced, box:$('box-view').getAttribute('aria-pressed')==='true', loads:$('show-loads').getAttribute('aria-pressed')==='true', station:Number($('station').value), scale:Number($('deformation').value), open:$('open-box').getAttribute('aria-pressed') === 'true', original:$('show-original').checked }; }
 function metrics() {
   const s=result.summary, d=result.design;
   const data=mode==='bending' ? [ ['|σ| máximo',s.sigmaMax/1e6,'MPa'],['Deflexão na ponta',s.displacement*1000,'mm'],['|My| na raiz',Math.abs(result.My[0])/1000,'kN·m'],['Escoamento · sem FS',s.yieldUtilization,'×'] ]
@@ -62,6 +65,8 @@ function recalculate() {
     valid = true; $('input-error').hidden = true; $('export').disabled = false; document.body.classList.remove('invalid');
     for (const button of $('cases').children) { const active = Number(button.dataset.case) === currentCase; button.classList.toggle('selected',active); button.setAttribute('aria-pressed',String(active)); }
     $('condition-badge').textContent = `${currentCase<0?'Livre':CASES[currentCase].name} · ${fmt(p.n,2)} g`;
+    flightEnvelope($('vn-diagram'),p,currentCase);
+    $('vn-status').textContent=`${currentCase<0?'Atual':CASES[currentCase].name} · ${fmt(p.speed,0)} m/s · ${fmt(p.n)} g`;
     metrics(); tables(); updateView();
   } catch (error) {
     valid = false; $('input-error').textContent = error.message; $('input-error').hidden = false; $('export').disabled = true;
@@ -76,7 +81,13 @@ function updateView() {
   const range = fieldRange(result,field,reinforced);
   $('legend-title').textContent = range[2]; $('colorbar').style.background=gradient;
   $('legend-min').textContent=fmt(range[0]); $('legend-mid').textContent=fmt((range[0]+range[1])/2); $('legend-max').textContent=fmt(range[1]);
-  $('model-badge').textContent = mode==='buckling' ? (reinforced?'Reforços esquemáticos':'Caixa sem reforços') : `Deformada ${opts.scale}× · engaste à esquerda`;
+  $('model-badge').textContent = `${opts.box?'Caixa de cálculo':'Asa esquemática · cores da caixa'} · ${opts.scale}×`;
+  const entries = mode==='bending' ? [ ['lift','ℓ',result.lift[index]/1000,'kN/m'],['drag','d',result.drag[index]/1000,'kN/m'],['lift','My',result.My[index]/1000,'kN·m'],['drag','Mz',result.Mz[index]/1000,'kN·m'] ]
+    : mode==='torsion' ? [['drag','m′',result.pitching[index]/1000,'kN·m/m'],['lift','T',result.torque[index]/1000,'kN·m']]
+    : [['compression','Σ Nc',compressionLoads(result,index).reduce((sum,a)=>sum+a.force,0)/1000,'kN'],['lift','My',result.My[index]/1000,'kN·m']];
+  $('load-summary').hidden=!opts.loads;
+  $('load-summary').innerHTML=`<span class="load-context">${mode==='buckling'?'Compressão atual':'Esforços atuais'} · x = ${fmt(x)} m</span>`+entries.map(([cls,label,value,unit])=>`<span class="${cls}">${label} <b>${fmt(value)}</b> ${unit}</span>`).join('')+'<span class="load-note">Setas em escala visual</span>';
+
   const bucklingUse = reinforced ? result.design.utilization : Math.max(...result.design.panels.map(a=>a.originalUtilization));
   const concern = mode==='buckling' ? bucklingUse>1 : result.summary.yieldUtilization>1;
   $('assessment').classList.toggle('warning',concern);
@@ -140,11 +151,27 @@ form.addEventListener('input',()=>{clearTimeout(timeout);timeout=setTimeout(reca
 $('station').addEventListener('input',updateView); $('deformation').addEventListener('input',updateView); $('show-original').addEventListener('change',updateView);
 $('field').addEventListener('change',()=>{field=$('field').value;updateView();}); $('chart').addEventListener('change',updateView);
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
-$('open-box').addEventListener('click',()=>{$('open-box').setAttribute('aria-pressed',String($('open-box').getAttribute('aria-pressed')!=='true'));updateView();});
+$('open-box').addEventListener('click',()=>{
+  $('box-view').setAttribute('aria-pressed','true');
+  $('open-box').setAttribute('aria-pressed',String($('open-box').getAttribute('aria-pressed')!=='true'));updateView();viewer?.home();
+});
+$('box-view').addEventListener('click',()=>{
+  $('box-view').setAttribute('aria-pressed',String($('box-view').getAttribute('aria-pressed')!=='true'));
+  if($('box-view').getAttribute('aria-pressed')==='false')$('open-box').setAttribute('aria-pressed','false');
+  updateView();viewer?.home();
+});
+$('show-loads').addEventListener('click',()=>{$('show-loads').setAttribute('aria-pressed',String($('show-loads').getAttribute('aria-pressed')!=='true'));updateView();});
+function selectFlight(event) {
+  const target=event.target.closest('[data-flight]');if(!target)return;
+  if(event.type==='keydown'&&!['Enter',' '].includes(event.key))return;
+  event.preventDefault();const index=Number(target.dataset.flight);$('cases').children[index].click();
+  $('vn-diagram').querySelector(`[data-flight="${index}"]`).focus({preventScroll:true});
+}
+$('vn-diagram').addEventListener('click',selectFlight);$('vn-diagram').addEventListener('keydown',selectFlight);
 $('home').addEventListener('click',()=>viewer?.home());
 $('about').addEventListener('click',()=>$('about-dialog').showModal());
 $('export').addEventListener('click',()=>$('export-dialog').showModal());
-$('reset').addEventListener('click',()=>{p={...DEFAULTS};writeInputs();$('station').value=0;$('deformation').value=10;$('envelope').checked=true;recalculate();viewer?.home();});
+$('reset').addEventListener('click',()=>{p={...DEFAULTS};writeInputs();$('station').value=0;$('deformation').value=10;$('envelope').checked=true;$('box-view').setAttribute('aria-pressed','false');$('open-box').setAttribute('aria-pressed','false');$('show-loads').setAttribute('aria-pressed','true');recalculate();viewer?.home();});
 $('chart-svg').addEventListener('click',event=>{const box=$('chart-svg').getBoundingClientRect();const x=(event.clientX-box.left)/box.width*540;$('station').value=Math.round(Math.max(0,Math.min(1,(x-55)/460))*240);updateView();});
 function download(content,name,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('csv').addEventListener('click',()=>{

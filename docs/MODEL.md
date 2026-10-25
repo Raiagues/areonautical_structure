@@ -6,7 +6,7 @@ Os três PDFs em `originals/` especificam uma asa retangular de 12 m × 2 m, mas
 
 O eixo x segue a semienvergadura, y a corda e z a altura. A raiz x=0 é engastada e a ponta x=b/2 é livre. Coordenadas da seção usadas nas tensões são relativas ao centroide. A tela informa também o centroide desde o canto inferior esquerdo.
 
-**Convenção atual:** c e h são dimensões nas linhas médias. Áreas e inércias são calculadas por integração de segmentos de parede fina, sem termos de ordem t³ ou sobreposição de cantos. Não se desenha um perfil NACA fictício: o objeto é a caixa estrutural retangular do enunciado. A corda aerodinâmica e a largura da caixa compartilham c, como no trabalho simplificado.
+**Convenção atual:** c e h são dimensões nas linhas médias. Áreas e inércias são calculadas por integração de segmentos de parede fina, sem termos de ordem t³ ou sobreposição de cantos. A corda aerodinâmica e a largura da caixa compartilham c, como no trabalho simplificado. O botão **Só caixa** mostra essa geometria de cálculo. A vista inicial mostra uma asa de perfil esquemático, com bordo de ataque arredondado, bordo de fuga fechado e pequeno arqueamento. Não é uma reconstrução do NACA 63A415 nem uma análise estrutural da pele aerodinâmica. Cada terço das superfícies superior/inferior recebe os valores do painel correspondente da caixa, preservando x e y e projetando z. O probe identifica essa projeção. As almas internas e suas tensões aparecem na vista da caixa e na seção transversal. A forma visual não altera cargas, inércias ou rigidez.
 
 O cenário inicial usa h=0,5 m, t₁=4 mm, t₂=4 mm, t₃=3 mm. São valores editáveis da versão atual, não uma alegação de reprodução dos resultados legados. Os relatórios divergem entre a introdução (t=0,1 m) e trechos posteriores (t₁=1,6 mm); não se impôs uma dessas versões como verdade única. Valores incompatíveis com paredes finas são rejeitados.
 
@@ -72,3 +72,15 @@ Não há flambagem por cisalhamento, interação compressão–cisalhamento, fle
 - [Three.js — OrbitControls](https://threejs.org/docs/pages/OrbitControls.html) e [BufferGeometry](https://threejs.org/docs/pages/BufferGeometry.html), usados na visualização; os cálculos não dependem do WebGL.
 
 `tests/model.test.mjs` verifica conservação de cargas, momento de raiz por centroide analítico de Schrenk, conversão angular, condições na ponta/raiz, convergência, reversão de cargas, solução fechada de três células quadradas, equilíbrio e compatibilidade torsional, escala V², modos de placa, quantidade inteira de apoios, envelope e validação de entradas. Os testes de navegador verificam WebGL, controles, cortes, modos, recalculo, exportação, importação e layout móvel.
+
+## V–n e representação dos esforços
+
+O diagrama lateral reproduz o envelope de referência de `legacy/trabalho4/code/VN.py`: limites +7,5/−3 g; ramos de estol `n=7,5(V/100)²` e `n=−3(V/80)²`; vértices (100;7,5), (180;7,5), (180;−1,06), (140;−3), (80;−3). As linhas tracejadas são as referências de rajada originais `1±4V/140` e `1±2,06V/180`. P1–P5 seguem a numeração dos enunciados/CASES, corrigindo a troca de rótulos P4/P5 existente no gráfico Python. Os pontos clicáveis aplicam n, α e V sem alterar a geometria. Entradas livres movem o marcador; o envelope de referência não é recalculado ou certificado para parâmetros diferentes.
+
+- Flexão: setas de ℓ e d distribuídos, com direção transformada por α no referencial não deformado; comprimento proporcional dentro de cada família e normalizado separadamente. Arcos My e Mz na seção selecionada.
+- Torção: arcos distribuídos m′ e arco T na seção, com sentido invertido quando o sinal de Cm muda. T desaparece na ponta livre e todos os arcos somem para Cm=0. Arcos têm raio ilustrativo.
+- Flambagem: pares de setas axiais convergentes nos três painéis com maior resultante compressiva da **condição e seção atuais**. `Nc=∫max(−σ,0)t ds`, integrado exatamente para a tensão linear de cada painel. A legenda ΣNc soma todos os painéis comprimidos. Os pares são deslocados visualmente para dentro da asa perto das extremidades. O campo de utilização continua podendo representar o envelope P1–P5 + atual, independentemente dessas forças. My mostra a flexão que origina a compressão; não se simula um modo de flambagem.
+
+Cores de esforços: verde claro para ℓ/My/T, amarelo para d/Mz/m′ e rosa para Nc. Os valores da legenda são assinados e usam a seção selecionada. As setas e deformações têm ampliação visual; não devem ser medidas como geometria física. Esforços nulos não recebem setas. O botão **Esforços** permite ocultá-las.
+
+Os campos 3D, seção e barra usam a paleta **jet** dos códigos originais `TENSAO.py`/`CISALHAMENTO.py`, com a tabela padrão de 256 entradas do [Matplotlib](https://matplotlib.org/stable/gallery/color/colormap_reference.html). Tensão normal usa limites simétricos; cisalhamento e deslocamento usam magnitude. As escalas são recalculadas para cada cenário e continuam numericamente identificadas.
