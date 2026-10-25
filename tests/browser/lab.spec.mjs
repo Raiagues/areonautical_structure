@@ -20,6 +20,9 @@ test('3D, cases, sections, modes and geometry recalculate without errors',async(
   await expect(page.locator('#open-box')).toHaveAttribute('aria-pressed','true');
   await page.getByRole('button',{name:'Com reforços',exact:true}).click();
   await expect(page.locator('#reinforced')).toHaveText('Sem reforços');
+  await expect(page.locator('#metrics')).toContainText('Sem reforços · FS');
+  await page.locator('#chart').selectOption('pitching');
+  await expect(page.locator('#chart-key')).toContainText('m′');
   await page.locator('#field').selectOption('sigma');
   await expect(page.locator('#legend-title')).toHaveText('σ · MPa');
   await page.locator('#deformation').fill('0');await page.locator('#deformation').dispatchEvent('input');

@@ -31,7 +31,7 @@ for (const [index, c] of CASES.entries()) {
 }
 const reinforceButton = document.createElement('button'); reinforceButton.id = 'reinforced'; reinforceButton.textContent = 'Com reforços'; reinforceButton.setAttribute('aria-pressed','true'); reinforceButton.hidden = true;
 $('open-box').after(reinforceButton);
-reinforceButton.addEventListener('click', () => { reinforced = !reinforced; reinforceButton.textContent = reinforced ? 'Com reforços' : 'Sem reforços'; reinforceButton.setAttribute('aria-pressed', String(reinforced)); updateView(); });
+reinforceButton.addEventListener('click', () => { reinforced = !reinforced; reinforceButton.textContent = reinforced ? 'Com reforços' : 'Sem reforços'; reinforceButton.setAttribute('aria-pressed', String(reinforced)); metrics(); updateView(); });
 
 try {
   viewer = new WingViewer($('scene'), probe => {
@@ -51,7 +51,7 @@ function metrics() {
   const s=result.summary, d=result.design;
   const data=mode==='bending' ? [ ['|σ| máximo',s.sigmaMax/1e6,'MPa'],['Deflexão na ponta',s.displacement*1000,'mm'],['|My| na raiz',Math.abs(result.My[0])/1000,'kN·m'],['Escoamento · sem FS',s.yieldUtilization,'×'] ]
     : mode==='torsion' ? [ ['|τ| máximo',s.tauMax/1e6,'MPa'],['Torção na ponta',s.twist*180/Math.PI,'°'],['Torque na raiz',result.torque[0]/1000,'kN·m'],['Rigidez GJ',result.section.GJ/1e6,'MN·m²'] ]
-    : [ ['Reforçadores',d.stringers,''],['Nervuras internas',d.internalRibs,''],['Passo das nervuras',d.ribSpacing*1000,'mm'],['Utilização · com FS',d.utilization,'×'] ];
+    : [ ['Reforçadores',d.stringers,''],['Nervuras internas',d.internalRibs,''],['Passo das nervuras',d.ribSpacing*1000,'mm'],[reinforced?'Com reforços · FS':'Sem reforços · FS',reinforced?d.utilization:Math.max(...d.panels.map(a=>a.originalUtilization)),'×'] ];
   $('metrics').innerHTML = data.map(([label,value,unit],i)=>`<div class="metric"><span>${label}</span><strong>${fmt(value,mode==='buckling'&&i<2?0:2)}<em>${unit}</em></strong></div>`).join('');
 }
 function recalculate() {
@@ -77,10 +77,11 @@ function updateView() {
   $('legend-title').textContent = range[2]; $('colorbar').style.background=gradient;
   $('legend-min').textContent=fmt(range[0]); $('legend-mid').textContent=fmt((range[0]+range[1])/2); $('legend-max').textContent=fmt(range[1]);
   $('model-badge').textContent = mode==='buckling' ? (reinforced?'Reforços esquemáticos':'Caixa sem reforços') : `Deformada ${opts.scale}× · engaste à esquerda`;
-  const concern = mode==='buckling' ? result.design.utilization>1 : result.summary.yieldUtilization>1;
+  const bucklingUse = reinforced ? result.design.utilization : Math.max(...result.design.panels.map(a=>a.originalUtilization));
+  const concern = mode==='buckling' ? bucklingUse>1 : result.summary.yieldUtilization>1;
   $('assessment').classList.toggle('warning',concern);
   $('assessment').textContent = mode==='buckling'
-    ? `${result.design.envelope?'Envelope P1–P5 + atual':'Condição atual'} · Compressão elástica · ${concern?'Limite excedido: aumente a espessura ou reveja o material.':'Dimensionamento por painéis e Euler.'}${result.design.stringers>1000||result.design.internalRibs>100?' Linhas de reforço reduzidas na visualização.':''}`
+    ? `${result.design.envelope?'Envelope P1–P5 + atual':'Condição atual'} · Compressão elástica · ${!reinforced?'Caixa sem reforços · ':''}${concern?(reinforced?'Limite excedido: aumente a espessura ou reveja o material.':'Limite excedido; consulte o dimensionamento com reforços.'):'Dimensionamento por painéis e Euler.'}${result.design.stringers>1000||result.design.internalRibs>100?' Linhas de reforço reduzidas na visualização.':''}`
     : `${concern?'Escoamento excedido. ':''}Tração (+) · Compressão (−) · Deformada ampliada apenas na visualização.`;
   if (viewer) viewer.update(result,opts);
   sectionPlot(index,range); chartPlot(index);
@@ -114,7 +115,7 @@ function sectionPlot(index,range) {
 }
 function chartPlot(index) {
   const r=result, kind=$('chart').value;
-  const data={loads:[['Sustentação',r.lift,1000],['Arrasto',r.drag,1000]],shear:[['Vy',r.Vy,1000],['Vz',r.Vz,1000]],moments:[['My',r.My,1000],['Mz',r.Mz,1000]],deflection:[['δy',r.v,.001],['δz',r.w,.001]],torque:[['T',r.torque,1000]],twist:[['θ',r.twist,Math.PI/180]],flow:r.section.qUnit.map((q,i)=>[`q${i+1}`,r.torque.map(t=>q*t),1000])}[kind];
+  const data={loads:[['Sustentação',r.lift,1000],['Arrasto',r.drag,1000]],shear:[['Vy',r.Vy,1000],['Vz',r.Vz,1000]],moments:[['My',r.My,1000],['Mz',r.Mz,1000]],deflection:[['δy',r.v,.001],['δz',r.w,.001]],pitching:[['m′',r.pitching,1000]],torque:[['T',r.torque,1000]],twistRate:[['θ′',r.twistRate,Math.PI/180]],twist:[['θ',r.twist,Math.PI/180]],flow:r.section.qUnit.map((q,i)=>[`q${i+1}`,r.torque.map(t=>q*t),1000])}[kind];
   const all=data.flatMap(([,v,d])=>v.map(x=>x/d)); let lo=Math.min(0,...all),hi=Math.max(0,...all); if(hi-lo<1e-12){hi=1;lo=-1;}
   const padding=(hi-lo)*.08;lo-=padding;hi+=padding;
   const X=x=>55+x/(p.span/2)*460,Y=y=>180-(y-lo)/(hi-lo)*155;
