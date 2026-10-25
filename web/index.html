@@ -13,10 +13,11 @@
   <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 24 16 4l13 20-13-6zM16 4v14"/></svg><span>ESTRUTURAS <b>ALARES</b></span></a>
   <nav class="tabs" aria-label="Análise"><button data-mode="bending" class="selected" aria-pressed="true"><small>01</small> Flexão</button><button data-mode="torsion" aria-pressed="false"><small>02</small> Torção</button><button data-mode="buckling" aria-pressed="false"><small>04</small> Flambagem</button></nav>
   <button id="about" class="quiet">Sobre o modelo ↗</button>
+  <a class="mobile-config" href="#parameters">Ajustar ↓</a>
 </header>
 <main class="workspace">
   <aside class="inputs" aria-label="Parâmetros da análise">
-    <div class="panel-heading"><span>CONFIGURAÇÃO</span><button id="reset" class="quiet">Restaurar</button></div>
+    <div class="panel-heading"><span>CONFIGURAÇÃO</span><a class="mobile-config" href="#analysis-title">Ver análise ↑</a><button id="reset" class="quiet">Restaurar</button></div>
     <form id="parameters">
       <fieldset><legend>Condição de voo</legend><div id="cases" class="cases" role="group" aria-label="Condições de voo"></div>
         <div class="three-fields"><label>n <span>g</span><input name="n" type="number" step="0.01" required></label><label>α <span>°</span><input name="alpha" type="number" step="0.1" required></label><label>V <span>m/s</span><input name="speed" type="number" step="1" required></label></div>

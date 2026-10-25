@@ -26,7 +26,7 @@ export function fieldValue(r, panel, index, y, z, field, reinforced) {
 }
 export class WingViewer {
   constructor(element, onProbe) {
-    this.element = element; this.onProbe = onProbe; this.meshes = [];
+    this.element = element; this.onProbe = onProbe; this.meshes = []; this.autoFit = true;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color('#121e29');
     this.camera = new THREE.PerspectiveCamera(35, 1, 0.01, 500);
@@ -37,13 +37,15 @@ export class WingViewer {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = false; this.controls.minDistance = 0.3; this.controls.maxDistance = 100;
     this.controls.addEventListener('change', () => this.draw());
+    this.controls.addEventListener('start', () => { this.autoFit = false; });
     this.scene.add(new THREE.HemisphereLight(0xe9f9ff, 0x506778, 2));
     const light = new THREE.DirectionalLight(0xffffff, 2); light.position.set(-4, 8, 5); this.scene.add(light);
     this.group = new THREE.Group(); this.scene.add(this.group);
     this.raycaster = new THREE.Raycaster();
     this.resize = new ResizeObserver(() => {
       const { width, height } = element.getBoundingClientRect();
-      this.renderer.setSize(width, height, false); this.camera.aspect = width / Math.max(1, height); this.camera.updateProjectionMatrix(); this.draw();
+      this.renderer.setSize(width, height, false); this.camera.aspect = width / Math.max(1, height); this.camera.updateProjectionMatrix();
+      if (this.result && this.autoFit) this.home(); else this.draw();
     });
     this.resize.observe(element);
     element.addEventListener('pointermove', e => this.probe(e));
@@ -57,10 +59,20 @@ export class WingViewer {
   }
   draw() { this.renderer.render(this.scene, this.camera); }
   home() {
-    const L = this.result?.p.span / 2 || 6, c = this.result?.p.chord || 2;
-    const size = Math.max(L, c * 2);
-    this.camera.position.set(size * 0.78, size * 0.7, size * 1.08);
-    this.controls.target.set(0, 0, 0); this.controls.update(); this.draw();
+    if (!this.result) return;
+    this.autoFit = true;
+    const box = new THREE.Box3().setFromObject(this.group), center = box.getCenter(new THREE.Vector3());
+    const direction = new THREE.Vector3(.78,.7,1.08).normalize();
+    const right = new THREE.Vector3(direction.z,0,-direction.x).normalize();
+    const up = new THREE.Vector3().crossVectors(direction,right).normalize();
+    const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)), tanH = tanV * this.camera.aspect;
+    let distance = 1;
+    for (const x of [box.min.x,box.max.x]) for (const y of [box.min.y,box.max.y]) for (const z of [box.min.z,box.max.z]) {
+      const point = new THREE.Vector3(x,y,z).sub(center);
+      distance = Math.max(distance,point.dot(direction) + Math.max(Math.abs(point.dot(right))/tanH,Math.abs(point.dot(up))/tanV));
+    }
+    this.camera.position.copy(center).addScaledVector(direction,distance*1.18);
+    this.controls.target.copy(center); this.controls.update(); this.draw();
   }
   point(x, y, z, original = false) {
     const r = this.result, index = Math.min(r.x.length - 1, Math.round(x / r.dx));
