@@ -62,12 +62,23 @@ export class WingViewer {
     const right = new THREE.Vector3(direction.z,0,-direction.x).normalize();
     const up = new THREE.Vector3().crossVectors(direction,right).normalize();
     const tanV = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)), tanH = tanV * this.camera.aspect;
-    let distance = 1;
-    for (const x of [box.min.x,box.max.x]) for (const y of [box.min.y,box.max.y]) for (const z of [box.min.z,box.max.z]) {
-      const point = new THREE.Vector3(x,y,z).sub(center);
-      distance = Math.max(distance,point.dot(direction) + Math.max(Math.abs(point.dot(right))/tanH,Math.abs(point.dot(up))/tanV));
-    }
-    this.camera.position.copy(center).addScaledVector(direction,distance*1.18);
+    // Fit the actual vertices, avoiding the empty corners of a world-aligned box.
+    // Sprite corners are evaluated in the camera plane because they face the camera.
+    this.group.updateMatrixWorld(true);
+    let distance = .1;
+    const fit = point => {
+      point.sub(center);
+      distance=Math.max(distance,point.dot(direction)+Math.max(Math.abs(point.dot(right))/tanH,Math.abs(point.dot(up))/tanV));
+    };
+    this.group.traverse(object=>{
+      if(object.isSprite) {
+        for(const a of [-.5,.5])for(const b of [-.5,.5])fit(object.position.clone().addScaledVector(right,a*object.scale.x).addScaledVector(up,b*object.scale.y));
+      } else if(object.geometry?.attributes.position) {
+        const positions=object.geometry.attributes.position;
+        for(let i=0;i<positions.count;i++)fit(new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(object.matrixWorld));
+      }
+    });
+    this.camera.position.copy(center).addScaledVector(direction,distance*1.13);
     this.controls.target.copy(center); this.controls.update(); this.draw();
   }
   point(x, y, z, original = false) {
@@ -165,8 +176,10 @@ export class WingViewer {
   }
   arrow(from,to,hex,size) {
     const direction=to.clone().sub(from),length=direction.length(); if(length<1e-8)return;
-    this.line([from,to],hex);
     const head=Math.min(size,length*.4);
+    const shaft=new THREE.Mesh(new THREE.CylinderGeometry(size*.045,size*.045,length-head/2,8),new THREE.MeshBasicMaterial({color:hex}));
+    shaft.position.copy(from).lerp(to,.5).addScaledVector(direction.clone().normalize(),-head/4);
+    shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction.clone().normalize());this.group.add(shaft);
     const cone=new THREE.Mesh(new THREE.ConeGeometry(head*.38,head,12),new THREE.MeshBasicMaterial({color:hex}));
     direction.normalize();cone.position.copy(to).addScaledVector(direction,-head/2);
     cone.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),direction);this.group.add(cone);
@@ -187,7 +200,8 @@ export class WingViewer {
       const t=.35+Math.sign(value)*i/48*Math.PI*1.55,s=Math.sin(t)*radius,c=Math.cos(t)*radius;
       const q=axis==='x'?[0,c,s]:axis==='y'?[s,0,c]:[c,s,0];return transform(q.map((v,j)=>v+offset[j]));
     });
-    this.line(pts,hex);this.arrow(pts.at(-4),pts.at(-1),hex,r.p.chord*.09);
+    this.group.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),64,r.p.chord*.0025,6,false),new THREE.MeshBasicMaterial({color:hex})));
+    this.arrow(pts.at(-8),pts.at(-1),hex,r.p.chord*.09);
     if(label)this.label(label,pts[22].clone().add(new THREE.Vector3(0,r.p.chord*.12,0)),hex);
   }
   loadGlyphs() {
@@ -208,8 +222,8 @@ export class WingViewer {
       this.moment(x,'y',r.My[i],c*.28,mint,'My',[-c*.18,-c*.62,0]);
       this.moment(x,'z',r.Mz[i],c*.25,gold,'Mz',[-c*.18,c*.65,0]);
     } else if(this.options.mode==='torsion') {
-      for(let j=0;j<5;j++) {const sx=L*(.1+.8*j/4),k=Math.round(sx/r.dx);this.moment(sx,'x',r.pitching[k],c*.34,gold,j===2?'m′':null);}
-      this.moment(x,'x',r.torque[i],c*.56,mint,'T');
+      for(let j=0;j<4;j++) {const sx=L*(.14+.74*j/3),k=Math.round(sx/r.dx);this.moment(sx,'x',r.pitching[k],c*.58,gold,j===2?'m′':null);}
+      this.moment(x,'x',r.torque[i],c*.72,mint,'T');
     } else {
       const loads=compressionLoads(r,i).sort((a,b)=>b.force-a.force),max=loads[0]?.force||1;
       // Three most compressed panels; N values refer to the current section/condition.
